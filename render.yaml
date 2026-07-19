@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: stockroom-inventory
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATA_DIR
+        value: /opt/render/project/src/data
+    disk:
+      name: stockroom-data
+      mountPath: /opt/render/project/src/data
+      sizeGB: 1

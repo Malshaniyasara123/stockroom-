@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Overview · Stockroom{% endblock %}
+{% block content %}
+
+<header class="page-head">
+    <div>
+        <p class="eyebrow">Today's ledger</p>
+        <h1>Overview</h1>
+    </div>
+    <a href="{{ url_for('new_product') }}" class="btn btn-primary">+ New product</a>
+</header>
+
+<section class="stat-row">
+    <div class="stat-card">
+        <span class="stat-label">Products tracked</span>
+        <span class="stat-value">{{ total_products }}</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Stock value</span>
+        <span class="stat-value">Rs. {{ "%.2f"|format(total_value) }}</span>
+    </div>
+    <div class="stat-card {{ 'stat-warn' if low_stock }}">
+        <span class="stat-label">Low stock items</span>
+        <span class="stat-value">{{ low_stock|length }}</span>
+    </div>
+</section>
+
+<div class="two-col">
+    <section class="panel">
+        <h2>Low stock alerts</h2>
+        {% if low_stock %}
+        <table class="ledger-table">
+            <thead><tr><th>SKU</th><th>Product</th><th>On hand</th><th>Reorder at</th></tr></thead>
+            <tbody>
+            {% for p in low_stock %}
+                <tr>
+                    <td class="mono">{{ p.sku }}</td>
+                    <td>{{ p.name }}</td>
+                    <td class="mono">{{ p.quantity }}</td>
+                    <td class="mono">{{ p.reorder_level }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="empty-note">Nothing running low. Stock levels look healthy.</p>
+        {% endif %}
+    </section>
+
+    <section class="panel">
+        <h2>Recent movement</h2>
+        {% if recent_tx %}
+        <table class="ledger-table">
+            <thead><tr><th>When</th><th>Product</th><th>Type</th><th>Qty</th></tr></thead>
+            <tbody>
+            {% for t in recent_tx %}
+                <tr>
+                    <td class="mono muted">{{ t.created_at[:16] }}</td>
+                    <td>{{ t.product_name }}</td>
+                    <td><span class="tag tag-{{ t.type }}">{{ 'IN' if t.type == 'in' else 'OUT' }}</span></td>
+                    <td class="mono">{{ t.quantity }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="empty-note">No stock movement recorded yet.</p>
+        {% endif %}
+    </section>
+</div>
+
+{% endblock %}

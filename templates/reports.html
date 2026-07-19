@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Reports · Stockroom{% endblock %}
+{% block content %}
+
+<header class="page-head">
+    <div>
+        <p class="eyebrow">Summary</p>
+        <h1>Reports</h1>
+    </div>
+</header>
+
+<section class="stat-row">
+    <div class="stat-card">
+        <span class="stat-label">Total stock value</span>
+        <span class="stat-value">Rs. {{ "%.2f"|format(total_value) }}</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Total units on hand</span>
+        <span class="stat-value">{{ total_units }}</span>
+    </div>
+</section>
+
+<div class="two-col">
+    <section class="panel">
+        <h2>Value by category</h2>
+        {% if by_category %}
+        <table class="ledger-table">
+            <thead><tr><th>Category</th><th>Products</th><th>Value</th></tr></thead>
+            <tbody>
+            {% for cat, data in by_category.items() %}
+                <tr>
+                    <td>{{ cat }}</td>
+                    <td class="mono">{{ data.count }}</td>
+                    <td class="mono">Rs. {{ "%.2f"|format(data.value) }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="empty-note">No products yet.</p>
+        {% endif %}
+    </section>
+
+    <section class="panel">
+        <h2>Reorder list</h2>
+        {% if low_stock %}
+        <table class="ledger-table">
+            <thead><tr><th>SKU</th><th>Product</th><th>On hand</th><th>Reorder at</th></tr></thead>
+            <tbody>
+            {% for p in low_stock %}
+                <tr>
+                    <td class="mono">{{ p.sku }}</td>
+                    <td>{{ p.name }}</td>
+                    <td class="mono">{{ p.quantity }}</td>
+                    <td class="mono">{{ p.reorder_level }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="empty-note">Nothing needs reordering right now.</p>
+        {% endif %}
+    </section>
+</div>
+
+{% endblock %}

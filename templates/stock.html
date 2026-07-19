@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Stock Movement · Stockroom{% endblock %}
+{% block content %}
+
+<header class="page-head">
+    <div>
+        <p class="eyebrow">Record movement</p>
+        <h1>Stock Movement</h1>
+    </div>
+</header>
+
+<section class="panel form-panel">
+    {% if products %}
+    <form method="post" class="stock-form">
+        <label class="field">
+            <span>Product</span>
+            <select name="product_id" required>
+                {% for p in products %}
+                <option value="{{ p.id }}">{{ p.name }} ({{ p.sku }}) — {{ p.quantity }} in stock</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label class="field">
+            <span>Movement</span>
+            <select name="type" required>
+                <option value="in">Stock in (received)</option>
+                <option value="out">Stock out (sold / used)</option>
+            </select>
+        </label>
+        <label class="field">
+            <span>Quantity</span>
+            <input type="number" name="quantity" min="1" required>
+        </label>
+        <label class="field field-wide">
+            <span>Note (optional)</span>
+            <input type="text" name="note" placeholder="e.g. supplier delivery, customer order #102">
+        </label>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Record movement</button>
+        </div>
+    </form>
+    {% else %}
+    <p class="empty-note">Add a product first before recording stock movement.</p>
+    {% endif %}
+</section>
+
+<section class="panel">
+    <h2>Movement history</h2>
+    {% if history %}
+    <table class="ledger-table">
+        <thead><tr><th>When</th><th>SKU</th><th>Product</th><th>Type</th><th>Qty</th><th>Note</th></tr></thead>
+        <tbody>
+        {% for t in history %}
+            <tr>
+                <td class="mono muted">{{ t.created_at[:16] }}</td>
+                <td class="mono">{{ t.product_sku }}</td>
+                <td>{{ t.product_name }}</td>
+                <td><span class="tag tag-{{ t.type }}">{{ 'IN' if t.type == 'in' else 'OUT' }}</span></td>
+                <td class="mono">{{ t.quantity }}</td>
+                <td class="muted">{{ t.note or "—" }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="empty-note">No movement recorded yet.</p>
+    {% endif %}
+</section>
+
+{% endblock %}

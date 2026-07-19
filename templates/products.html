@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Products · Stockroom{% endblock %}
+{% block content %}
+
+<header class="page-head">
+    <div>
+        <p class="eyebrow">Catalogue</p>
+        <h1>Products</h1>
+    </div>
+    <a href="{{ url_for('new_product') }}" class="btn btn-primary">+ New product</a>
+</header>
+
+<form class="search-row" method="get">
+    <input type="text" name="q" value="{{ q }}" placeholder="Search by name, SKU or category…">
+    <button class="btn btn-ghost" type="submit">Search</button>
+</form>
+
+<section class="panel">
+    {% if products %}
+    <table class="ledger-table">
+        <thead>
+            <tr><th>SKU</th><th>Name</th><th>Category</th><th>Qty</th><th>Price</th><th>Value</th><th></th></tr>
+        </thead>
+        <tbody>
+        {% for p in products %}
+            <tr class="{{ 'row-warn' if p.quantity <= p.reorder_level }}">
+                <td class="mono">{{ p.sku }}</td>
+                <td>{{ p.name }}</td>
+                <td class="muted">{{ p.category or "—" }}</td>
+                <td class="mono">{{ p.quantity }}
+                    {% if p.quantity <= p.reorder_level %}<span class="stamp">low</span>{% endif %}
+                </td>
+                <td class="mono">Rs. {{ "%.2f"|format(p.price) }}</td>
+                <td class="mono">Rs. {{ "%.2f"|format(p.quantity * p.price) }}</td>
+                <td class="row-actions">
+                    <a href="{{ url_for('edit_product', product_id=p.id) }}">Edit</a>
+                    <form method="post" action="{{ url_for('delete_product', product_id=p.id) }}"
+                          onsubmit="return confirm('Delete {{ p.name }}? This cannot be undone.');">
+                        <button type="submit" class="link-btn">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="empty-note">
+        {% if q %}No products match "{{ q }}".{% else %}No products yet. Add your first one to get started.{% endif %}
+    </p>
+    {% endif %}
+</section>
+
+{% endblock %}
